@@ -27,7 +27,7 @@ void test_messageSerializeR(){
     }
     else
     {
-        cout<<"NO OK"<<endl;
+        cout<<"Fail"<<endl;
     }
 };
 
