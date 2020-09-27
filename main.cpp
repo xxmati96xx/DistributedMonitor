@@ -15,7 +15,7 @@ void test_messageSerializeT(){
     }
     else
     {
-        cout<<"NO OK"<<endl;
+        cout<<"FAIL"<<endl;
     }
 };
 void test_messageSerializeR(){ 
@@ -27,7 +27,7 @@ void test_messageSerializeR(){
     }
     else
     {
-        cout<<"Fail"<<endl;
+        cout<<"FAIL"<<endl;
     }
 };
 
@@ -45,7 +45,7 @@ void test_messageDeserializeT(){
     }
     else
     {
-        cout<<"NO OK"<<endl;
+        cout<<"FAIL"<<endl;
     }
 };
 

@@ -1,8 +1,10 @@
 CXX = g++
 
 MESSAGE = ./message/message.cpp
+TOKEN = ./sk/token.cpp
+SK = ./sk/sk.cpp
 MAIN = ./main.cpp
-ALL = $(MESSAGE) $(MAIN)
+ALL = $(MESSAGE) $(TOKEN) $(SK) $(MAIN)
 
 #Libraries
 LIBS = -lzmq -pthread 
