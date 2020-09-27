@@ -9,11 +9,12 @@ class Token{
     vector<int> getLN();
     queue<int> getRequestProcess();
     void addRequestProcess(int port);
-    void setLN(int position,int sn);
+    void setLNPosition(int position,int sn);
     void setRequestProcess(queue<int> LN);
     void setToken(Message message);
     int getFirstProcessFromQueue();
     void addNewProcesToLN();
+    void setLN(vector<int> LN);
 
 
     private:

@@ -9,7 +9,7 @@ void Token::addRequestProcess(int port){
     requestProcess.push(port);
 }
 
-void Token::setLN(int position,int value){
+void Token::setLNPosition(int position,int value){
     LN[position] = value;
 }
 
@@ -31,4 +31,8 @@ int Token::getFirstProcessFromQueue(){
 
  void Token::addNewProcesToLN(){
      LN.push_back(0);
+ }
+
+ void Token::setLN(vector<int> LN){
+     this->LN = LN;
  }

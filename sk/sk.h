@@ -13,6 +13,9 @@ class SK{
     void reciveMessage(Message message);
     void endCS();
     bool isCS();
+    Token getToken();
+    void setToken(Token token);
+    vector<pair<int,int>> getRN();
     SK(int port, bool useToken);
     ~SK();
 

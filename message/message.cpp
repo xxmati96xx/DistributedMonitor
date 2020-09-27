@@ -75,6 +75,7 @@ string Message::queueToString(queue<int> requestProcess){
          queueString += to_string(request.front())+";";
         request.pop();
     }
+    //tu jest blad pusta kolejka a mimo to usuwa ostatni element naprawić
     queueString.pop_back(); //remove last element ";"
     return queueString;
 }

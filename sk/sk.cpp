@@ -41,23 +41,26 @@ void SK::sendMessage(Message message,int port){
     zmq_close(socket);
 }
 
-void SK::reciveMessage(Message message){
-    Message message = message.messageDeserialize();
+void SK::reciveMessage(Message mes){
+    Message message = mes.messageDeserialize();
     if(message.getMessageType() == "R"){
-        for(pair<int,int> item:RN){
-            if(item.first == message.getPort()){
-                item.second = max(item.second,message.getSn());
+        for(auto it=begin(RN); it!=end(RN); ++it){
+            if(it->first == message.getPort()){
+                //cout<<"Add to RN second "<<it->first<<" "<<it->second<<endl;
+                it->second = message.getSn();
                 break;
             }
         }
         if(useToken && token.getRequestProcess().size()==0){
-            for(int i=0; i<RN.size(); i++){
-                if(RN[i].second == token.getLN()[i]+1){
+            vector<int> LN = token.getLN();  
+            for(size_t i=0; i<RN.size(); i++){
+                if(RN[i].second == LN[i]+1){
                     token.addRequestProcess(RN[i].first);
                 }
             }
-            if(token.getRequestProcess().size()>0)
+            if(token.getRequestProcess().size()>0){
             tokenMessage();
+            }
         }
     }
     else if(message.getMessageType() == "T"){
@@ -78,16 +81,29 @@ Message SK::getRequestMessage(){
 }
 
 void SK::endCS(){
-    for(int i=0; i<RN.size(); i++){
+    for(size_t i=0; i<RN.size(); i++){
         if(RN[i].first == port){
-            token.setLN(i,RN[i].second);
-            break;
-        }
+            token.setLNPosition(i,RN[i].second);
+        }else if(!isInRequestProcess(RN[i].first)){
+            if(RN[i].second == token.getLN()[i]+1){
+                token.addRequestProcess(RN[i].first);
+            }
+        }  
+    }
+    if(token.getRequestProcess().size()>0){
+        tokenMessage();
     }
 }
 
 bool SK::isInRequestProcess(int port){
-    
+    queue<int> cp_requestProcess = token.getRequestProcess();
+    int process;
+    while(cp_requestProcess.size()>0){
+        process = cp_requestProcess.front();
+        cp_requestProcess.pop();
+        if(process == port){return true;}
+    }
+    return false;
 }
 
 SK::SK(int port,bool useToken){
@@ -101,3 +117,10 @@ SK::~SK(){
 }
 
 
+vector<pair<int,int>> SK::getRN(){return RN;};
+
+Token SK::getToken(){return token;};
+
+void SK::setToken(Token token){
+    this->token = token;
+}
