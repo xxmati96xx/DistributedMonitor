@@ -14,6 +14,7 @@ class SK{
     void endCS();
     bool isCS();
     Token getToken();
+    bool getUseToken();
     void setToken(Token token);
     vector<pair<int,int>> getRN();
     SK(int port, bool useToken);

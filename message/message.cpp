@@ -23,9 +23,10 @@ Message Message::messageDeserialize(){
             LN.push_back(stoi(LNString[i]));
         }
         vector<string> requestProcessString = fragmentString(fragmentStringMessage[3],';');
-        queue<int> requestProcess;
-        for(size_t i=0;i<requestProcessString.size();i++){
-            requestProcess.push(stoi(requestProcessString[i]));
+        if(requestProcessString[0] != "empty"){
+            for(size_t i=0;i<requestProcessString.size();i++){
+                requestProcess.push(stoi(requestProcessString[i]));
+            }
         }
         return Message{"T",stoi(fragmentStringMessage[1]),LN,requestProcess};
     }
@@ -71,12 +72,15 @@ string Message::queueToString(queue<int> requestProcess){
     queue<int> request = requestProcess;
     int queueSize = request.size();
     string queueString = "";
+    if(queueSize >0){
     for(int i=0; i<queueSize; i++){
          queueString += to_string(request.front())+";";
         request.pop();
     }
-    //tu jest blad pusta kolejka a mimo to usuwa ostatni element naprawić
     queueString.pop_back(); //remove last element ";"
+    return queueString;
+    }
+    queueString += "empty";
     return queueString;
 }
 //Kod z internetu {
