@@ -1,5 +1,7 @@
 
-#include "./sk/sk.h"
+//#include "./sk/sk.h"
+#include "./monitor/monitor.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -118,12 +120,83 @@ void test_requestMessage(){
     sk.requestMessage();
 }
 
-int main(){
+void test_producer(queue<int> *buffer, size_t size){
+    vector<int> other;
+    other.push_back(1251);
+    other.push_back(1252);
+    Monitor monit{1250,true,other};
+    for(int i=0; i<100; i++){
+        monit.in();
+        if(buffer->size()<size){
+        buffer->push(i);
+        }else{
+            cout<<"Buffer full"<<endl;
+        }
+        monit.out();
+         this_thread::sleep_for (std::chrono::seconds(3));
+    }
+}
+
+void test_consument1(queue<int> *buffer, size_t size){
+    vector<int> other;
+    other.push_back(1250);
+    other.push_back(1252);
+    Monitor monit{1251,false,other};
+    for(int i=0; i<100; i++){
+        monit.in();
+        cout<<"cons1: "<<endl;
+       // if(buffer->size()!=0){
+            //cout<<"buffer element: "<<&buffer->front()<<endl;
+      //      buffer->pop();
+       // }else{
+            cout<<"Buffer empty"<<endl;//naprawić buffor
+       // }
+        monit.out();
+         this_thread::sleep_for (std::chrono::seconds(3));
+    }
+}
+
+void test_consument2(queue<int> *buffer, size_t size){
+    vector<int> other;
+    other.push_back(1251);
+    other.push_back(1250);
+    Monitor monit{1252,false,other};
+    for(int i=0; i<100; i++){
+        monit.in();
+        cout<<"cons1: "<<endl;
+        //if(buffer->size()!=0){
+            //cout<<"buffer element: "<<&buffer->front()<<endl;
+           // buffer->pop();
+        //}else{
+            cout<<"Buffer empty"<<endl;
+       // }
+        monit.out();
+         this_thread::sleep_for (std::chrono::seconds(3));
+    }
+}
+
+int main(int argc,char **argv){
     test_messageSerializeT();
     test_messageSerializeR();
     test_messageDeserializeT();
-    test_reciveMessage();
-    test_tokenMessage();
-    test_requestMessage();
+    //test_reciveMessage();
+    //test_tokenMessage();
+    //test_requestMessage();
+    queue<int> *buffer;
+    size_t size = 5;
+    switch (stoi(argv[1]))
+    {
+    case 1:
+        test_producer(buffer,size);
+        break;
+    case 2:
+        test_consument1(buffer,size);
+        break;
+    case 3:
+        test_consument2(buffer,size);
+        break;
+    default:
+        break;
+    }
     return 0;
 };

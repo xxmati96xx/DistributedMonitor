@@ -3,18 +3,23 @@
 
 void SK::addProcessToRN(int port){
     RN.push_back(make_pair(port,0));
+}
+
+void SK::initLN(){
     token.addNewProcesToLN();
 }
 
 void SK::requestMessage(){
-    for(pair<int,int> item:RN){
-        if(item.first == port){
-            cout<<"Test sn increment:przed "<<item.second<<endl;
-            item.second++; 
-            cout<<"Test sn increment:po "<<item.second<<endl;
-            break;
-        }
+    for (auto it = begin (RN); it != end (RN); ++it) {
+        if(it->first==port) it->second++;     
     }
+    //for(pair<int,int> item:RN){
+    //    if(item.first == port){
+    //        cout<<"Test sn increment:przed "<<item.second<<endl;
+    //        item.second += 1; 
+    //        cout<<"Test sn increment:po "<<item.second<<endl;
+    //    }
+    //}
     Message message = getRequestMessage();
     for(pair<int,int> item:RN){
         if(item.first != port){
@@ -35,9 +40,10 @@ void SK::tokenMessage(){
 void SK::sendMessage(Message message,int port){
     string messageSerialized = message.messageSerialize();
     void *socket = zmq_socket(context,ZMQ_REQ);
-    string destination = "tcp://127.0.0.1:"+to_string(port);
-    if(zmq_connect(socket,destination.c_str())==0){
-        //zmq_send(socket,messageSerialized.c_str(),sizeof(messageSerialized),0); dla testów wyłaczone 
+    string connect = "tcp://127.0.0.1:"+to_string(port);
+    if(zmq_connect(socket,connect.c_str())==0){
+        zmq_send(socket,messageSerialized.c_str(),sizeof(messageSerialized),0); 
+        //dla testów wyłaczone 
     }
     else{
         cout<<"zmq_error"<<zmq_strerror(zmq_errno())<<endl;
@@ -51,7 +57,7 @@ void SK::reciveMessage(Message mes){
         for(auto it=begin(RN); it!=end(RN); ++it){
             if(it->first == message.getPort()){
                 //cout<<"Add to RN second "<<it->first<<" "<<it->second<<endl;
-                it->second = message.getSn();
+                it->second = message.getSn();//poprawić na max()
                 break;
             }
         }
@@ -77,6 +83,7 @@ void SK::reciveMessage(Message mes){
 Message SK::getRequestMessage(){
     for(pair<int,int> item:RN){
         if(item.first == port){
+            cout<<"sn :"<<item.second<<endl;
             return {"R",port,item.second};
         }
     
@@ -111,7 +118,6 @@ bool SK::isInRequestProcess(int port){
 }
 
 SK::SK(int port,bool useToken){
-    addProcessToRN(port);
     this->useToken = useToken;
     this->port = port;
     context = zmq_ctx_new();

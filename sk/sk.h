@@ -12,7 +12,7 @@ class SK{
     void tokenMessage();
     void reciveMessage(Message message);
     void endCS();
-    bool isCS();
+    void initLN();
     Token getToken();
     bool getUseToken();
     void setToken(Token token);
