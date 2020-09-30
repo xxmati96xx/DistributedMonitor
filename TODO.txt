@@ -1,5 +1,5 @@
 TODO:
 Standaryzacja for;
 Przerobienie na komunikację pomiędzy innymi systemami(zdalna komunikacja - addresy ip)
-Dodanie metod setData,getData do monitora w celu umożliwienia programiście łatwego przekazywania danych w wiadomościach Token(wymaga serializacji i deserializacji po stronie programisty)
-Testowy program konsumenci i producenci przez przekazanie wskaźnika na buffor(lokalnie) oraz przez kopiowanie i otwarzanie (zdalnie inny system);
+Dodanie metod setData,getData do monitora w celu umożliwienia programiście łatwego przekazywania danych w wiadomościach Token(wymaga serializacji i deserializacji po stronie programisty) - bez wielkich tesów ale działa
+Testowy program konsumenci i producenci przez przekazanie wskaźnika na buffor(lokalnie) oraz przez kopiowanie i otwarzanie (zdalnie inny system) --działa komunikacja w obrębie jednego systemu;

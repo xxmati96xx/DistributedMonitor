@@ -122,77 +122,179 @@ void test_requestMessage(){
     sk.addProcessToRN(1254);
     sk.requestMessage();
 }
-/*
-void test_producer(){
+
+string dataToString(queue<int> queue){
+    string queueString ="";
+    while (queue.size()>0)
+    {
+        queueString += to_string(queue.front())+"|";
+        queue.pop();
+    }
+    if(queueString.size()>0){
+        queueString.pop_back();
+    }
+    cout<<"queue: "<<queueString<<endl;
+    return queueString;
+}
+
+vector<string> fragmentString(const string &txt, char ch)
+{
+    vector<string> strs;
+    size_t pos = txt.find( ch );
+    size_t initialPos = 0;
+    strs.clear();
+
+    // Decompose statement
+    while( pos != string::npos ) {
+        strs.push_back( txt.substr( initialPos, pos - initialPos ) );
+        initialPos = pos + 1;
+
+        pos = txt.find( ch, initialPos );
+    }
+
+    // Add the last one
+    strs.push_back( txt.substr( initialPos, std::min( pos, txt.size() ) - initialPos + 1 ) );
+
+    return strs;
+}
+
+queue<int> stringToData(string data){
+    //cout<<data.size()<<" wielkość danych"<<endl;
+    queue<int> queue;
+    if(data.size()>0){
+        vector<string> fragmentStringData = fragmentString(data,'|');
+    
+        if(fragmentStringData.size()>0){
+            for(size_t i=0; i<fragmentStringData.size();i++){
+        //cout<<"push elemetn: "+fragmentStringData[i]<<endl;
+                queue.push(stoi(fragmentStringData[i]));
+        
+            }
+        }
+    }
+    return queue;
+}
+
+void test_producer1(){
     //queue<int> queue;
-    //cout<<"adres queue: "<<&queue<<endl;
-    buffer = new queue<int>;
-    cout<<"adres buffer: "<<&buffer<<endl;
-    size = 5;
+    size_t size = 5;
     vector<int> other;
     other.push_back(1251);
     other.push_back(1252);
+     other.push_back(1253);
     Monitor monit{1250,true,other};
-    for(int i=0; i<100; i++){
+    int i=0;
+    while (i<100){
         monit.in();
-        if(buffer->size()<size){
-            cout<<i<<endl;
-        buffer->push(i);
-        cout<<"buffer element:push "<<buffer->front()<<endl;
+        //if(monit.getData().size()>0){
+         queue<int> queue = stringToData(monit.getData());
+       // }
+        if(queue.size()<size){
+            cout<<"Push element: "<<i<<endl;
+            queue.push(i);
+            i++;
+            cout<<"jakie jest i"<<i<<endl;
         }else{
-            cout<<"Buffer full"<<endl;
-            //for(size_t i=0;i<size;i++){
-            //    cout<<"buffer element: "<<buffer.front()<<endl;
-                buffer->pop();
-            //}
+            cout<<"Queue full"<<endl;
         }
+        monit.setData(dataToString(queue));
         monit.out();
-         this_thread::sleep_for (std::chrono::seconds(1));
+         this_thread::sleep_for (std::chrono::milliseconds(100));
+         
     }
+    cout<<"end"<<endl;
 }
-
-void test_consument1(){
+void test_producer2(){
+   // queue<int> queue;
+    size_t size = 5;
     vector<int> other;
     other.push_back(1250);
     other.push_back(1252);
+     other.push_back(1253);
     Monitor monit{1251,false,other};
-    for(int i=0; i<100; i++){
+    int i=0;
+    while (i<100){
         monit.in();
-        cout<<"cons1: "<<endl;
-        if(buffer.size()!=0){
-            cout<<"buffer element: "<<buffer.front()<<endl;
-            buffer.pop();
+        //if(monit.getData().size()>0){
+          queue<int> queue = stringToData(monit.getData());
+        //}
+        if(queue.size()<size){
+            cout<<"Push element: "<<i<<endl;
+            queue.push(i);
+            i++;
+            cout<<"jakie jest i"<<i<<endl;
         }else{
-            cout<<"Buffer empty"<<endl;//naprawić buffor
+            cout<<"Queue full"<<endl;
         }
+        monit.setData(dataToString(queue));
         monit.out();
-         this_thread::sleep_for (std::chrono::seconds(3));
+         this_thread::sleep_for (std::chrono::milliseconds(100));
+        
     }
+     cout<<"end"<<endl;
+}
+
+void test_consument1(){
+    //queue<int> queue;
+    
+    vector<int> other;
+    other.push_back(1250);
+    other.push_back(1251);
+    other.push_back(1253);
+    Monitor monit{1252,false,other};
+    int i=0;
+    while (i<100)
+    {
+        monit.in();
+        //if(monit.getData().size()>0){
+            queue<int> queue = stringToData(monit.getData());
+        //}
+        if(queue.size()!=0){
+            int item = queue.front();
+            queue.pop();
+            cout<<"Take element: "<<item<<endl;
+            i++;
+            cout<<"jakie jest i"<<i<<endl;
+        }else{
+            cout<<"Queue empty"<<endl;
+        }
+        monit.setData(dataToString(queue));
+        monit.out();
+         this_thread::sleep_for (std::chrono::milliseconds(100));
+         
+    }
+    cout<<"end"<<endl;
 }
 
 void test_consument2(){
     vector<int> other;
     other.push_back(1251);
     other.push_back(1250);
-    Monitor monit{1252,false,other};
-    for(int i=0; i<100; i++){
+    other.push_back(1252);
+    Monitor monit{1253,false,other};
+    int i=0;
+    while (i<100)
+    {
         monit.in();
-        cout<<"cons1: "<<endl;
-        if(buffer.size()!=0){
-            cout<<"buffer element: "<<buffer.front()<<endl;
-            buffer.pop();
+        //if(monit.getData().size()>0){
+            queue<int> queue = stringToData(monit.getData());
+        //}
+        if(queue.size()!=0){
+            int item = queue.front();
+            queue.pop();
+            cout<<"Take element: "<<item<<endl;
+            i++;
+            cout<<"jakie jest i"<<i<<endl;
         }else{
-            cout<<"Buffer empty"<<endl;
+            cout<<"Queue empty"<<endl;
         }
+        monit.setData(dataToString(queue));
         monit.out();
-         this_thread::sleep_for (std::chrono::seconds(3));
+         this_thread::sleep_for (std::chrono::milliseconds(100));
+        
     }
+     cout<<"end"<<endl;
 }
-
-*/
-
-
-
 
 void test_dataSendInTokenMessage(){
     vector<int> other;
@@ -233,19 +335,21 @@ int main(int argc,char **argv){
     switch (stoi(argv[1]))
     {
     case 1:
-        test_dataSendInTokenMessage();
+        test_producer1();
         break;
     case 2:
-        //test_consument1();
-        test_dataSendInTokenMessage1();
+        test_producer2();
         break;
     case 3:
-        //test_consument2();
+        test_consument1();
+        break;
+    case 4:
+        test_consument2();
         break;
     default:
         break;
     }
-  
+  /*
 
     vector<string> addres;
     addres.push_back("192.168.0.15:1251");
@@ -313,6 +417,6 @@ int main(int argc,char **argv){
         cout<<it->first<<" addres "<<it->second<<" SN value"<<endl;     
     }
     
-   
+   */
     return 0;
 };

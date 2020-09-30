@@ -23,7 +23,7 @@ void SK::requestMessage(){
     Message message = getRequestMessage();
     for(pair<int,int> item:RN){
         if(item.first != port){
-            cout<<"Test port send: "<<item.first<<endl;
+            //cout<<"Test port send: "<<item.first<<endl;
             sendMessage(message,item.first);
         }
     }

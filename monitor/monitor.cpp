@@ -32,7 +32,7 @@ void Monitor::in(){
         sk.requestMessage();
         while (!sk.getUseToken())
         {
-            this_thread::sleep_for (std::chrono::seconds(1));
+            this_thread::sleep_for (std::chrono::milliseconds(10));
         }
     }
 }
@@ -49,7 +49,7 @@ void Monitor::receiveMessage(){
         if(zmq_recv(socket,receiveBUff,BUFSIZ,0)>-1){
             zmq_send(socket,"",0,0);
             string message(receiveBUff);
-            cout<<message<<endl;
+            //cout<<message<<endl;
             sk.reciveMessage(message);
         }
     }
