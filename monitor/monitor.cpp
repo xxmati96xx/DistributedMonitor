@@ -43,14 +43,22 @@ void Monitor::out(){
 
 
 void Monitor::receiveMessage(){
-    char *receiveBUff = new char[128];
+    char *receiveBUff = new char[BUFSIZ];
     while(1){
-        memset(receiveBUff,0,128);
-        if(zmq_recv(socket,receiveBUff,128,0)>-1){
+        memset(receiveBUff,0,BUFSIZ);
+        if(zmq_recv(socket,receiveBUff,BUFSIZ,0)>-1){
             zmq_send(socket,"",0,0);
             string message(receiveBUff);
             cout<<message<<endl;
             sk.reciveMessage(message);
         }
     }
+}
+
+void Monitor::setData(string data){
+    sk.setData(data);
+}
+
+string Monitor::getData(){
+    return sk.getData();
 }

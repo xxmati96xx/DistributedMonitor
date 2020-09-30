@@ -5,6 +5,9 @@
 
 using namespace std;
 
+//queue<int> *buffer;
+//size_t size;
+
 void test_messageSerializeT(){ 
     vector<int> LN = {1,3,7};
     queue<int> requestProcess;
@@ -13,7 +16,7 @@ void test_messageSerializeT(){
     //requestProcess.push(3);
     int port = 1250;
     Message messsage{"T",port,LN,requestProcess};
-    if(messsage.messageSerialize()=="T,1250,1;3;7,empty"){//nadal bład ale nie moge się skupić
+    if(messsage.messageSerialize()=="T,1250,1;3;7,empty"){
         cout<<"OK"<<endl;
     }
     else
@@ -119,8 +122,13 @@ void test_requestMessage(){
     sk.addProcessToRN(1254);
     sk.requestMessage();
 }
-
-void test_producer(queue<int> *buffer, size_t size){
+/*
+void test_producer(){
+    //queue<int> queue;
+    //cout<<"adres queue: "<<&queue<<endl;
+    buffer = new queue<int>;
+    cout<<"adres buffer: "<<&buffer<<endl;
+    size = 5;
     vector<int> other;
     other.push_back(1251);
     other.push_back(1252);
@@ -128,16 +136,22 @@ void test_producer(queue<int> *buffer, size_t size){
     for(int i=0; i<100; i++){
         monit.in();
         if(buffer->size()<size){
+            cout<<i<<endl;
         buffer->push(i);
+        cout<<"buffer element:push "<<buffer->front()<<endl;
         }else{
             cout<<"Buffer full"<<endl;
+            //for(size_t i=0;i<size;i++){
+            //    cout<<"buffer element: "<<buffer.front()<<endl;
+                buffer->pop();
+            //}
         }
         monit.out();
-         this_thread::sleep_for (std::chrono::seconds(3));
+         this_thread::sleep_for (std::chrono::seconds(1));
     }
 }
 
-void test_consument1(queue<int> *buffer, size_t size){
+void test_consument1(){
     vector<int> other;
     other.push_back(1250);
     other.push_back(1252);
@@ -145,18 +159,18 @@ void test_consument1(queue<int> *buffer, size_t size){
     for(int i=0; i<100; i++){
         monit.in();
         cout<<"cons1: "<<endl;
-       // if(buffer->size()!=0){
-            //cout<<"buffer element: "<<&buffer->front()<<endl;
-      //      buffer->pop();
-       // }else{
+        if(buffer.size()!=0){
+            cout<<"buffer element: "<<buffer.front()<<endl;
+            buffer.pop();
+        }else{
             cout<<"Buffer empty"<<endl;//naprawić buffor
-       // }
+        }
         monit.out();
          this_thread::sleep_for (std::chrono::seconds(3));
     }
 }
 
-void test_consument2(queue<int> *buffer, size_t size){
+void test_consument2(){
     vector<int> other;
     other.push_back(1251);
     other.push_back(1250);
@@ -164,17 +178,50 @@ void test_consument2(queue<int> *buffer, size_t size){
     for(int i=0; i<100; i++){
         monit.in();
         cout<<"cons1: "<<endl;
-        //if(buffer->size()!=0){
-            //cout<<"buffer element: "<<&buffer->front()<<endl;
-           // buffer->pop();
-        //}else{
+        if(buffer.size()!=0){
+            cout<<"buffer element: "<<buffer.front()<<endl;
+            buffer.pop();
+        }else{
             cout<<"Buffer empty"<<endl;
-       // }
+        }
         monit.out();
          this_thread::sleep_for (std::chrono::seconds(3));
     }
 }
 
+*/
+
+
+
+
+void test_dataSendInTokenMessage(){
+    vector<int> other;
+    other.push_back(1250);
+    Monitor monit{1251,true,other};
+    for(int i=0; i<100; i++){
+        monit.in();
+        cout<<"To dostałem do innego procesu: "<<monit.getData()<<endl;
+        string str = "To jest test wiadomosci";
+        cout<<"Wyswietl wiadomosc "<<str<<endl;
+        monit.setData(str);
+        monit.out();
+         this_thread::sleep_for (std::chrono::seconds(3));
+    }
+}
+void test_dataSendInTokenMessage1(){
+    vector<int> other;
+    other.push_back(1251);
+    Monitor monit{1250,false,other};
+    for(int i=0; i<100; i++){
+        monit.in();
+        cout<<"To dostałem do innego procesu: "<<monit.getData()<<endl;
+        string str = "To jest inna wiadomosc do testu";
+        cout<<"Wyswietl wiadomosc "<<str<<endl;
+        monit.setData(str);
+        monit.out();
+         this_thread::sleep_for (std::chrono::seconds(3));
+    }
+}
 int main(int argc,char **argv){
     test_messageSerializeT();
     test_messageSerializeR();
@@ -182,21 +229,90 @@ int main(int argc,char **argv){
     //test_reciveMessage();
     //test_tokenMessage();
     //test_requestMessage();
-    queue<int> *buffer;
-    size_t size = 5;
+    
     switch (stoi(argv[1]))
     {
     case 1:
-        test_producer(buffer,size);
+        test_dataSendInTokenMessage();
         break;
     case 2:
-        test_consument1(buffer,size);
+        //test_consument1();
+        test_dataSendInTokenMessage1();
         break;
     case 3:
-        test_consument2(buffer,size);
+        //test_consument2();
         break;
     default:
         break;
     }
+  
+
+    vector<string> addres;
+    addres.push_back("192.168.0.15:1251");
+    addres.push_back("192.168.0.16:1251");
+    addres.push_back("192.168.0.20:1251");
+    addres.push_back("027.0.0.1:1242");
+    addres.push_back("192.168.0.1:1251");
+    addres.push_back("127.0.0.1:1242");
+    sort(addres.begin(),addres.end());
+    for(size_t i=0;i<addres.size();i++){
+        cout<<"vector element1: "<<addres[i]<<endl;
+    }
+    vector<string> addres1;
+    addres1.push_back("192.168.0.16:1251");
+    addres1.push_back("192.168.0.15:1251");
+    addres1.push_back("192.168.0.20:1251");
+    addres1.push_back("027.0.0.1:1242");
+    addres1.push_back("192.168.0.1:1251");
+    addres1.push_back("127.0.0.1:1242");
+    sort(addres1.begin(),addres1.end());
+    for(size_t i=0;i<addres1.size();i++){
+        cout<<"vector element2: "<<addres1[i]<<endl;
+    }
+    vector<string> addres2;
+    addres2.push_back("027.0.0.1:1242");
+    addres2.push_back("192.168.0.16:1251");
+    addres2.push_back("192.168.0.15:1251");
+    addres2.push_back("192.168.0.20:1251");
+    addres2.push_back("192.168.0.1:1251");
+    addres2.push_back("127.0.0.1:1242");
+    sort(addres2.begin(),addres2.end());
+    for(size_t i=0;i<addres2.size();i++){
+        cout<<"vector element3: "<<addres2[i]<<endl;
+    }
+    vector<string> addres3;
+    string st = "192.168.0.20:1251";
+    addres3.push_back("192.168.0.1:1251");
+    addres3.push_back("192.168.0.16:1251");
+    addres3.push_back("192.168.0.15:1251");
+    addres3.push_back("192.168.0.20:1251");
+    addres3.push_back("027.0.0.1:1242");
+    addres3.push_back("127.0.0.1:1242");
+    sort(addres3.begin(),addres3.end());
+    for(size_t i=0;i<addres3.size();i++){
+        if(st == addres3[i]){
+            cout<<"Działa"<<endl;
+        }
+        cout<<"vector element4: "<<addres3[i]<<endl;
+    }
+    if((addres == addres1) && (addres2 == addres3) && (addres == addres2) && (addres1 == addres3) && (addres == addres3) && (addres1 == addres2)){
+        cout<<"OK"<<endl;
+    }else
+    {
+       cout<<"FAIL"<<endl;
+    }
+    vector<pair<string,int>> RN;
+    RN.push_back(make_pair("192.168.0.20:1251",0));
+    RN.push_back(make_pair("192.168.0.5:1251",0));
+    RN.push_back(make_pair("192.168.0.18:1251",0));
+    RN.push_back(make_pair("192.168.0.20:1245",0));
+     for (auto it = begin (RN); it != end (RN); ++it) {
+        if(it->first==st) it->second++;     
+    }
+    for (auto it = begin (RN); it != end (RN); ++it) {
+        cout<<it->first<<" addres "<<it->second<<" SN value"<<endl;     
+    }
+    
+   
     return 0;
 };

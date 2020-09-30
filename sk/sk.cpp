@@ -33,6 +33,7 @@ void SK::tokenMessage(){
     useToken = false;
     int destination = token.getFirstProcessFromQueue();
     Message message{"T",destination,token.getLN(),token.getRequestProcess()};
+    message.setData(data);
     sendMessage(message,destination);
 }
 
@@ -42,7 +43,7 @@ void SK::sendMessage(Message message,int port){
     void *socket = zmq_socket(context,ZMQ_REQ);
     string connect = "tcp://127.0.0.1:"+to_string(port);
     if(zmq_connect(socket,connect.c_str())==0){
-        zmq_send(socket,messageSerialized.c_str(),sizeof(messageSerialized),0); 
+        zmq_send(socket,messageSerialized.c_str(),messageSerialized.size(),0); 
         //dla testów wyłaczone 
     }
     else{
@@ -74,6 +75,7 @@ void SK::reciveMessage(Message mes){
         }
     }
     else if(message.getMessageType() == "T"){
+        setData(message.getData());
         token.setToken(message);
         useToken = true;
     }
@@ -83,7 +85,7 @@ void SK::reciveMessage(Message mes){
 Message SK::getRequestMessage(){
     for(pair<int,int> item:RN){
         if(item.first == port){
-            cout<<"sn :"<<item.second<<endl;
+            //cout<<"sn :"<<item.second<<endl;
             return {"R",port,item.second};
         }
     
@@ -138,4 +140,12 @@ void SK::setToken(Token token){
 
 bool SK::getUseToken(){
     return useToken;
+}
+
+void SK::setData(string data){
+    this->data = data;
+}
+
+string SK::getData(){
+    return data;
 }

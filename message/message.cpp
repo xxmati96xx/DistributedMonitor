@@ -28,7 +28,12 @@ Message Message::messageDeserialize(){
                 requestProcess.push(stoi(requestProcessString[i]));
             }
         }
-        return Message{"T",stoi(fragmentStringMessage[1]),LN,requestProcess};
+        Message mes{"T",stoi(fragmentStringMessage[1]),LN,requestProcess};
+        if(fragmentStringMessage.size()>4){
+        mes.setData(fragmentStringMessage[4]);
+        }
+        return mes;
+        //return Message{"T",stoi(fragmentStringMessage[1]),LN,requestProcess};
     }
     return Message{"B",0,0};
 }
@@ -44,6 +49,9 @@ string Message::messageSerialize(){
         messageString += to_string(getPort())+",";
         messageString += vectorToString(getLN())+",";
         messageString += queueToString(getRequestProcess());
+        if(data.size()>0){
+        messageString += ","+data;
+        }
     }
     return messageString;
 }
@@ -105,3 +113,11 @@ vector<string> Message::fragmentString(const string &txt, char ch)
     return strs;
 }
 //Koniec kod z internetu }
+
+void Message::setData(string data){
+    this->data = data;
+}
+
+string Message::getData(){
+    return data;
+}

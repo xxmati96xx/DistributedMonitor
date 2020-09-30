@@ -16,6 +16,8 @@ class Message {
         Message messageDeserialize();
         vector<int> getLN();
         queue<int> getRequestProcess();
+        void setData(string data);
+        string getData();
         int getPort();
         int getSn();
         string getMessageType();
@@ -25,6 +27,7 @@ class Message {
         vector<int> LN; 
         queue<int> requestProcess;
         string messageType; 
+        string data;
         string vectorToString(vector<int> LN);
         string queueToString(queue<int> requestProcess);
         vector<string> fragmentString(const string &txt, char ch);

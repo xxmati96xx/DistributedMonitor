@@ -11,6 +11,8 @@ class Monitor{
         ~Monitor();
         void in();
         void out();
+        void setData(string data);
+        string getData();
 
 
     private:

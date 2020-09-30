@@ -15,6 +15,8 @@ class SK{
     void initLN();
     Token getToken();
     bool getUseToken();
+    void setData(string data);
+    string getData();
     void setToken(Token token);
     vector<pair<int,int>> getRN();
     SK(int port, bool useToken);
@@ -26,6 +28,7 @@ class SK{
     int port;
     Token token;
     bool useToken;
+    string data;
     void sendMessage(Message message,int port);
     void *context;
     vector<pair<int,int>> RN;
