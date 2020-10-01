@@ -5,17 +5,20 @@
 Message::Message(string messageSerialized){
     this->messageSerialized = messageSerialized;
 }
-Message::Message(string messageTypeA,int portA,int snA):port(portA),sn(snA){
+Message::Message(string messageTypeA,string address,int snA):sn(snA){
+    this->address = address;
     messageType = messageTypeA;
 }
-Message::Message(string messageTypeA,int portA,vector<int> LNA,queue<int> requestProcessA):port(portA),LN(LNA),requestProcess(requestProcessA){
+Message::Message(string messageTypeA,string address,vector<int> LNA,queue<string> requestProcessA):LN(LNA){
+    this->requestProcess = requestProcessA;
     messageType = messageTypeA;
+    this->address = address;
 }
 
 Message Message::messageDeserialize(){
     vector<string> fragmentStringMessage = fragmentString(messageSerialized,',');
     if(fragmentStringMessage[0]=="R"){
-        return Message{"R",stoi(fragmentStringMessage[1]),stoi(fragmentStringMessage[2])};
+        return Message{"R",fragmentStringMessage[1],stoi(fragmentStringMessage[2])};
     }else if(fragmentStringMessage[0]=="T"){
         vector<string> LNString = fragmentString(fragmentStringMessage[2],';');
         vector<int> LN;
@@ -23,12 +26,13 @@ Message Message::messageDeserialize(){
             LN.push_back(stoi(LNString[i]));
         }
         vector<string> requestProcessString = fragmentString(fragmentStringMessage[3],';');
+        queue<string> requestProcess;
         if(requestProcessString[0] != "empty"){
             for(size_t i=0;i<requestProcessString.size();i++){
-                requestProcess.push(stoi(requestProcessString[i]));
+                requestProcess.push(requestProcessString[i]);
             }
         }
-        Message mes{"T",stoi(fragmentStringMessage[1]),LN,requestProcess};
+        Message mes{"T",fragmentStringMessage[1],LN,requestProcess};
         if(fragmentStringMessage.size()>4){
         mes.setData(fragmentStringMessage[4]);
         }
@@ -42,11 +46,11 @@ string Message::messageSerialize(){
     string messageString = "";
     if(getMessageType() == "R"){
         messageString += getMessageType()+",";
-        messageString += to_string(getPort())+",";
+        messageString += getAddress()+",";
         messageString += to_string(getSn());
     }else if(getMessageType() == "T"){
         messageString += getMessageType()+",";
-        messageString += to_string(getPort())+",";
+        messageString += getAddress()+",";
         messageString += vectorToString(getLN())+",";
         messageString += queueToString(getRequestProcess());
         if(data.size()>0){
@@ -60,12 +64,12 @@ string Message::messageSerialize(){
 
 string Message::getMessageType(){return messageType;};
 
-int Message::getPort() {return port;};
+string Message::getAddress() {return address;};
 
 int Message::getSn() {return sn;};
 
 vector<int> Message::getLN() {return LN;};
-queue<int> Message::getRequestProcess(){return requestProcess;};
+queue<string> Message::getRequestProcess(){return requestProcess;};
 
 string Message::vectorToString(vector<int> LN){
     string vectorSting ="";
@@ -76,13 +80,13 @@ string Message::vectorToString(vector<int> LN){
     return vectorSting;
 }
 
-string Message::queueToString(queue<int> requestProcess){
-    queue<int> request = requestProcess;
+string Message::queueToString(queue<string> requestProcess){
+    queue<string> request = requestProcess;
     int queueSize = request.size();
     string queueString = "";
     if(queueSize >0){
     for(int i=0; i<queueSize; i++){
-         queueString += to_string(request.front())+";";
+         queueString += request.front()+";";
         request.pop();
     }
     queueString.pop_back(); //remove last element ";"

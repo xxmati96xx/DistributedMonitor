@@ -1,8 +1,8 @@
 #include "sk.h"
 
 
-void SK::addProcessToRN(int port){
-    RN.push_back(make_pair(port,0));
+void SK::addProcessToRN(string address){
+    RN.push_back(make_pair(address,0));
 }
 
 void SK::initLN(){
@@ -10,38 +10,36 @@ void SK::initLN(){
 }
 
 void SK::requestMessage(){
-    for (auto it = begin (RN); it != end (RN); ++it) {
-        if(it->first==port) it->second++;     
+    for(size_t i=0; i<RN.size();i++){
+        if(RN[i].first == address){
+            //cout<<"Test sn increment:przed "<<RN[i].second<<endl;
+            RN[i].second = RN[i].second + 1; 
+            //cout<<"Test sn increment:po "<<RN[i].second<<endl;
+        }
     }
-    //for(pair<int,int> item:RN){
-    //    if(item.first == port){
-    //        cout<<"Test sn increment:przed "<<item.second<<endl;
-    //        item.second += 1; 
-    //        cout<<"Test sn increment:po "<<item.second<<endl;
-    //    }
-    //}
     Message message = getRequestMessage();
-    for(pair<int,int> item:RN){
-        if(item.first != port){
-            //cout<<"Test port send: "<<item.first<<endl;
-            sendMessage(message,item.first);
+    for(size_t i=0; i<RN.size();i++){
+        if(RN[i].first != address){
+            //cout<<"Test port send: "<<RN[i].first<<endl;
+            sendMessage(message,RN[i].first);
         }
     }
 }
     
 void SK::tokenMessage(){
     useToken = false;
-    int destination = token.getFirstProcessFromQueue();
+    string destination = token.getFirstProcessFromQueue();
     Message message{"T",destination,token.getLN(),token.getRequestProcess()};
     message.setData(data);
     sendMessage(message,destination);
 }
 
 
-void SK::sendMessage(Message message,int port){
+void SK::sendMessage(Message message,string address){
     string messageSerialized = message.messageSerialize();
+    //cout<<"message: "<<messageSerialized<<endl;
     void *socket = zmq_socket(context,ZMQ_REQ);
-    string connect = "tcp://127.0.0.1:"+to_string(port);
+    string connect = "tcp://"+address;
     if(zmq_connect(socket,connect.c_str())==0){
         zmq_send(socket,messageSerialized.c_str(),messageSerialized.size(),0); 
         //dla testów wyłaczone 
@@ -55,10 +53,12 @@ void SK::sendMessage(Message message,int port){
 void SK::reciveMessage(Message mes){
     Message message = mes.messageDeserialize();
     if(message.getMessageType() == "R"){
-        for(auto it=begin(RN); it!=end(RN); ++it){
-            if(it->first == message.getPort()){
-                //cout<<"Add to RN second "<<it->first<<" "<<it->second<<endl;
-                it->second = message.getSn();//poprawić na max()
+        for(size_t i=0; i<RN.size();i++){
+            if(RN[i].first == message.getAddress()){
+                //cout<<"Add to RN second "<<RN[i].first<<" "<<RN[i].second<<endl;
+                //cout<<"SN message: "<<message.getSn()<<endl;
+                RN[i].second = max(RN[i].second,message.getSn());//poprawić na max()
+                //cout<<"Test add to RN second "<<RN[i].first<<" "<<RN[i].second<<endl;
                 break;
             }
         }
@@ -83,10 +83,10 @@ void SK::reciveMessage(Message mes){
 
 
 Message SK::getRequestMessage(){
-    for(pair<int,int> item:RN){
-        if(item.first == port){
-            //cout<<"sn :"<<item.second<<endl;
-            return {"R",port,item.second};
+    for(size_t i=0; i<RN.size(); i++){
+        if(RN[i].first == address){
+            //cout<<"sn :"<<RN[i].second<<endl;
+            return {"R",RN[i].first,RN[i].second};
         }
     
     }
@@ -95,7 +95,7 @@ Message SK::getRequestMessage(){
 
 void SK::endCS(){
     for(size_t i=0; i<RN.size(); i++){
-        if(RN[i].first == port){
+        if(RN[i].first == address){
             token.setLNPosition(i,RN[i].second);
         }else if(!isInRequestProcess(RN[i].first)){
             if(RN[i].second == token.getLN()[i]+1){
@@ -108,20 +108,20 @@ void SK::endCS(){
     }
 }
 
-bool SK::isInRequestProcess(int port){
-    queue<int> cp_requestProcess = token.getRequestProcess();
-    int process;
+bool SK::isInRequestProcess(string address){
+    queue<string> cp_requestProcess = token.getRequestProcess();
+    string process;
     while(cp_requestProcess.size()>0){
         process = cp_requestProcess.front();
         cp_requestProcess.pop();
-        if(process == port){return true;}
+        if(process == address){return true;}
     }
     return false;
 }
 
-SK::SK(int port,bool useToken){
+SK::SK(string address,bool useToken){
     this->useToken = useToken;
-    this->port = port;
+    this->address = address;
     context = zmq_ctx_new();
 }
 
@@ -130,7 +130,7 @@ SK::~SK(){
 }
 
 
-vector<pair<int,int>> SK::getRN(){return RN;};
+vector<pair<string,int>> SK::getRN(){return RN;};
 
 Token SK::getToken(){return token;};
 

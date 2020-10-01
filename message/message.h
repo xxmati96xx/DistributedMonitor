@@ -10,26 +10,27 @@ using namespace std;
 class Message {
     public:
         Message(string messageSerialized);
-        Message(string messageType,int port,int sn);
-        Message(string messageType,int port,vector<int> LN,queue<int> requestProcess);
+        Message(string messageType,string address,int sn);
+        Message(string messageType,string address,vector<int> LN,queue<string> requestProcess);
         string messageSerialize();
         Message messageDeserialize();
         vector<int> getLN();
-        queue<int> getRequestProcess();
+        queue<string> getRequestProcess();
         void setData(string data);
         string getData();
-        int getPort();
+        string getAddress();
         int getSn();
         string getMessageType();
     private:
-        int port,sn;
+        int sn;
+        string address;
         string messageSerialized;
         vector<int> LN; 
-        queue<int> requestProcess;
+        queue<string> requestProcess;
         string messageType; 
         string data;
         string vectorToString(vector<int> LN);
-        string queueToString(queue<int> requestProcess);
+        string queueToString(queue<string> requestProcess);
         vector<string> fragmentString(const string &txt, char ch);
 
 };

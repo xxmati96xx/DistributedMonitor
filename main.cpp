@@ -10,13 +10,13 @@ using namespace std;
 
 void test_messageSerializeT(){ 
     vector<int> LN = {1,3,7};
-    queue<int> requestProcess;
+    queue<string> requestProcess;
     //requestProcess.push(1);
     //requestProcess.push(2);
     //requestProcess.push(3);
-    int port = 1250;
-    Message messsage{"T",port,LN,requestProcess};
-    if(messsage.messageSerialize()=="T,1250,1;3;7,empty"){
+    string address = "192.168.6.10:1520";
+    Message messsage{"T",address,LN,requestProcess};
+    if(messsage.messageSerialize()=="T,192.168.6.10:1520,1;3;7,empty"){
         cout<<"OK"<<endl;
     }
     else
@@ -25,10 +25,10 @@ void test_messageSerializeT(){
     }
 };
 void test_messageSerializeR(){ 
-    int port = 1250;
+    string address = "192.168.6.10:1520";
     int sn = 2;
-    Message messsage{"R",port,sn};
-    if(messsage.messageSerialize()=="R,1250,2"){
+    Message messsage{"R",address,sn};
+    if(messsage.messageSerialize()=="R,192.168.6.10:1520,2"){
         cout<<"OK"<<endl;
     }
     else
@@ -38,15 +38,15 @@ void test_messageSerializeR(){
 };
 
 void test_messageDeserializeT(){ 
-    Message messageSeralized{"T,1250,1;3;7,empty"};
+    Message messageSeralized{"T,192.168.6.10:1520,1;3;7,empty"};
     Message messageDeserialized = messageSeralized.messageDeserialize();
     vector<int> LN = {1,3,7};
-    queue<int> requestProcess;
+    queue<string> requestProcess;
    // requestProcess.push(1);
     //requestProcess.push(2);
     //requestProcess.push(3);
-    int port = 1250;
-    if(messageDeserialized.getMessageType()=="T" && LN==messageDeserialized.getLN() && requestProcess==messageDeserialized.getRequestProcess() && messageDeserialized.getPort()==port){
+     string address = "192.168.6.10:1520";
+    if(messageDeserialized.getMessageType()=="T" && LN==messageDeserialized.getLN() && requestProcess==messageDeserialized.getRequestProcess() && messageDeserialized.getAddress()==address){
         cout<<"OK"<<endl;
     }
     else
@@ -56,32 +56,32 @@ void test_messageDeserializeT(){
 };
 
 void test_reciveMessage(){
-    SK sk{1250,true};
-    sk.addProcessToRN(1251);
-    sk.addProcessToRN(1252);
-    sk.addProcessToRN(1253);
-    sk.addProcessToRN(1254);
+    SK sk{"192.168.6.10:1250",true};
+    sk.addProcessToRN("192.168.6.10:1251");
+    sk.addProcessToRN("192.168.6.10:1252");
+    sk.addProcessToRN("192.168.6.10:1253");
+    sk.addProcessToRN("192.168.6.10:1254");
     vector<int> LN = {0,0,0,0,0};
     Token token = sk.getToken();
     token.setLN(LN);
     sk.setToken(token);
-    Message message{"R,1251,1"};
+    Message message{"R,192.168.6.10:1251,1"};
     sk.reciveMessage(message);
-    message = {"R,1251,2"};
+    message = {"R,192.168.6.10:1251,2"};
     sk.reciveMessage(message);
-    message = {"R,1252,1"};
+    message = {"R,192.168.6.10:1252,1"};
     sk.reciveMessage(message);
-    message = {"R,1253,2"};
+    message = {"R,192.168.6.10:1253,2"};
     sk.reciveMessage(message);
-    message = {"R,1254,5"};
+    message = {"R,192.168.6.10:1254,5"};
     sk.reciveMessage(message);
     bool t1,t2,t3,t4;
-    vector<pair<int,int>> RN = sk.getRN();
+    vector<pair<string,int>> RN = sk.getRN();
     for(size_t i=0;i<RN.size();i++){
-        if(RN[i].first == 1251 && RN[i].second == 2){t1=true;};
-        if(RN[i].first == 1252 && RN[i].second == 1){t2=true;};
-        if(RN[i].first == 1253 && RN[i].second == 2){t3=true;};
-        if(RN[i].first == 1254 && RN[i].second == 5){t4=true;};
+        if(RN[i].first == "192.168.6.10:1251" && RN[i].second == 2){t1=true;};
+        if(RN[i].first == "192.168.6.10:1252" && RN[i].second == 1){t2=true;};
+        if(RN[i].first == "192.168.6.10:1253" && RN[i].second == 2){t3=true;};
+        if(RN[i].first == "192.168.6.10:1254" && RN[i].second == 5){t4=true;};
     }
     if(t1 && t2 && t3 && t4){
         cout<<"OK"<<endl;
@@ -92,17 +92,17 @@ void test_reciveMessage(){
 
 
 void test_tokenMessage(){
-    SK sk{1250,false};
-    sk.addProcessToRN(1251);
-    sk.addProcessToRN(1252);
-    sk.addProcessToRN(1253);
-    sk.addProcessToRN(1254);
-    queue<int> simpleQueue;
-    simpleQueue.push(1251);
-    simpleQueue.push(1252);
-    simpleQueue.push(1253);
+    SK sk{"192.168.6.10:1250",false};
+    sk.addProcessToRN("192.168.6.10:1251");
+    sk.addProcessToRN("192.168.6.10:1252");
+    sk.addProcessToRN("192.168.6.10:1253");
+    sk.addProcessToRN("192.168.6.10:1254");
+    queue<string> simpleQueue;
+    simpleQueue.push("192.168.6.10:1251");
+    simpleQueue.push("192.168.6.10:1252");
+    simpleQueue.push("192.168.6.10:1253");
     vector<int> LN = {0,1,0,0,0};
-    Message message{"T",1250,LN,simpleQueue};
+    Message message{"T","192.168.6.10:1250",LN,simpleQueue};
     Message messageSerialized = message.messageSerialize();
     sk.reciveMessage(messageSerialized);
     Token token = sk.getToken();
@@ -115,11 +115,11 @@ void test_tokenMessage(){
 }
 
 void test_requestMessage(){
-    SK sk{1250,false};
-    sk.addProcessToRN(1251);
-    sk.addProcessToRN(1252);
-    sk.addProcessToRN(1253);
-    sk.addProcessToRN(1254);
+    SK sk{"192.168.6.10:1250",false};
+    sk.addProcessToRN("192.168.6.10:1251");
+    sk.addProcessToRN("192.168.6.10:1252");
+    sk.addProcessToRN("192.168.6.10:1253");
+    sk.addProcessToRN("192.168.6.10:1254");
     sk.requestMessage();
 }
 
@@ -178,11 +178,11 @@ queue<int> stringToData(string data){
 void test_producer1(){
     //queue<int> queue;
     size_t size = 5;
-    vector<int> other;
-    other.push_back(1251);
-    other.push_back(1252);
-     other.push_back(1253);
-    Monitor monit{1250,true,other};
+    vector<string> other;
+    other.push_back("192.168.6.104:1251");
+    other.push_back("192.168.6.113:1252");
+    other.push_back("192.168.6.113:1253");
+    Monitor monit{"192.168.6.104:1250",true,other};
     int i=0;
     while (i<100){
         monit.in();
@@ -193,13 +193,13 @@ void test_producer1(){
             cout<<"Push element: "<<i<<endl;
             queue.push(i);
             i++;
-            cout<<"jakie jest i"<<i<<endl;
+            //cout<<"jakie jest i"<<i<<endl;
         }else{
             cout<<"Queue full"<<endl;
         }
         monit.setData(dataToString(queue));
         monit.out();
-         this_thread::sleep_for (std::chrono::milliseconds(100));
+         this_thread::sleep_for (std::chrono::milliseconds(1000));
          
     }
     cout<<"end"<<endl;
@@ -207,11 +207,11 @@ void test_producer1(){
 void test_producer2(){
    // queue<int> queue;
     size_t size = 5;
-    vector<int> other;
-    other.push_back(1250);
-    other.push_back(1252);
-     other.push_back(1253);
-    Monitor monit{1251,false,other};
+    vector<string> other;
+    other.push_back("192.168.6.104:1250");
+    other.push_back("192.168.6.113:1252");
+     other.push_back("192.168.6.113:1253");
+    Monitor monit{"192.168.6.104:1251",false,other};
     int i=0;
     while (i<100){
         monit.in();
@@ -222,13 +222,13 @@ void test_producer2(){
             cout<<"Push element: "<<i<<endl;
             queue.push(i);
             i++;
-            cout<<"jakie jest i"<<i<<endl;
+            //cout<<"jakie jest i"<<i<<endl;
         }else{
             cout<<"Queue full"<<endl;
         }
         monit.setData(dataToString(queue));
         monit.out();
-         this_thread::sleep_for (std::chrono::milliseconds(100));
+         this_thread::sleep_for (std::chrono::milliseconds(1000));
         
     }
      cout<<"end"<<endl;
@@ -237,11 +237,11 @@ void test_producer2(){
 void test_consument1(){
     //queue<int> queue;
     
-    vector<int> other;
-    other.push_back(1250);
-    other.push_back(1251);
-    other.push_back(1253);
-    Monitor monit{1252,false,other};
+    vector<string> other;
+    other.push_back("192.168.6.104:1250");
+    other.push_back("192.168.6.104:1251");
+    other.push_back("192.168.6.113:1253");
+    Monitor monit{"192.168.6.113:1252",false,other};
     int i=0;
     while (i<100)
     {
@@ -254,24 +254,24 @@ void test_consument1(){
             queue.pop();
             cout<<"Take element: "<<item<<endl;
             i++;
-            cout<<"jakie jest i"<<i<<endl;
+            //cout<<"jakie jest i"<<i<<endl;
         }else{
             cout<<"Queue empty"<<endl;
         }
         monit.setData(dataToString(queue));
         monit.out();
-         this_thread::sleep_for (std::chrono::milliseconds(100));
+         this_thread::sleep_for (std::chrono::milliseconds(1000));
          
     }
     cout<<"end"<<endl;
 }
 
 void test_consument2(){
-    vector<int> other;
-    other.push_back(1251);
-    other.push_back(1250);
-    other.push_back(1252);
-    Monitor monit{1253,false,other};
+    vector<string> other;
+    other.push_back("192.168.6.104:1251");
+    other.push_back("192.168.6.104:1250");
+    other.push_back("192.168.6.113:1252");
+    Monitor monit{"192.168.6.113:1253",false,other};
     int i=0;
     while (i<100)
     {
@@ -284,22 +284,22 @@ void test_consument2(){
             queue.pop();
             cout<<"Take element: "<<item<<endl;
             i++;
-            cout<<"jakie jest i"<<i<<endl;
+            //cout<<"jakie jest i"<<i<<endl;
         }else{
             cout<<"Queue empty"<<endl;
         }
         monit.setData(dataToString(queue));
         monit.out();
-         this_thread::sleep_for (std::chrono::milliseconds(100));
+         this_thread::sleep_for (std::chrono::milliseconds(1000));
         
     }
      cout<<"end"<<endl;
 }
 
 void test_dataSendInTokenMessage(){
-    vector<int> other;
-    other.push_back(1250);
-    Monitor monit{1251,true,other};
+    vector<string> other;
+    other.push_back("127.0.0.1:1250");
+    Monitor monit{"127.0.0.1:1251",true,other};
     for(int i=0; i<100; i++){
         monit.in();
         cout<<"To dostałem do innego procesu: "<<monit.getData()<<endl;
@@ -311,9 +311,9 @@ void test_dataSendInTokenMessage(){
     }
 }
 void test_dataSendInTokenMessage1(){
-    vector<int> other;
-    other.push_back(1251);
-    Monitor monit{1250,false,other};
+    vector<string> other;
+    other.push_back("127.0.0.1:1251");
+    Monitor monit{"127.0.0.1:1250",false,other};
     for(int i=0; i<100; i++){
         monit.in();
         cout<<"To dostałem do innego procesu: "<<monit.getData()<<endl;
@@ -405,18 +405,26 @@ int main(int argc,char **argv){
     {
        cout<<"FAIL"<<endl;
     }
+    
     vector<pair<string,int>> RN;
+    string st = "192.168.0.18:1251";
     RN.push_back(make_pair("192.168.0.20:1251",0));
     RN.push_back(make_pair("192.168.0.5:1251",0));
     RN.push_back(make_pair("192.168.0.18:1251",0));
     RN.push_back(make_pair("192.168.0.20:1245",0));
-     for (auto it = begin (RN); it != end (RN); ++it) {
-        if(it->first==st) it->second++;     
+    for(size_t i=0;i<RN.size();i++){
+        if(RN[i].first==st) {
+        RN[i].second = RN[i].second + 1;     
+        }
     }
+    // for (auto it = begin (RN); it != end (RN); ++it) {
+    //    if(it->first==st) it->second++;     
+   // }
     for (auto it = begin (RN); it != end (RN); ++it) {
         cout<<it->first<<" addres "<<it->second<<" SN value"<<endl;     
     }
+    */
     
-   */
+   
     return 0;
 };

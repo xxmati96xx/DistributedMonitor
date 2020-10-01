@@ -7,7 +7,7 @@
 using namespace std;
 class Monitor{
     public:
-        Monitor(int port,bool useToken,vector<int> other);
+        Monitor(string address,bool useToken,vector<string> other);
         ~Monitor();
         void in();
         void out();

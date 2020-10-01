@@ -3,17 +3,17 @@
 
 vector<int> Token::getLN(){return LN;};
 
-queue<int> Token::getRequestProcess(){return requestProcess;};
+queue<string> Token::getRequestProcess(){return requestProcess;};
 
-void Token::addRequestProcess(int port){
-    requestProcess.push(port);
+void Token::addRequestProcess(string address){
+    requestProcess.push(address);
 }
 
 void Token::setLNPosition(int position,int value){
     LN[position] = value;
 }
 
-void Token::setRequestProcess(queue<int> requestProcess){
+void Token::setRequestProcess(queue<string> requestProcess){
     this->requestProcess = requestProcess;
 }
 
@@ -23,10 +23,10 @@ void Token::setToken(Message message){
     requestProcess = message.getRequestProcess();
 }
 
-int Token::getFirstProcessFromQueue(){
-    int port = requestProcess.front();
+string Token::getFirstProcessFromQueue(){
+    string address = requestProcess.front();
     requestProcess.pop();
-    return port;
+    return address;
 }
 
  void Token::addNewProcesToLN(){

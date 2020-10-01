@@ -1,7 +1,7 @@
 #include "monitor.h"
 
-Monitor::Monitor(int port,bool useToken,vector<int> other):sk(port,useToken){
-    other.push_back(port);
+Monitor::Monitor(string address,bool useToken,vector<string> other):sk(address,useToken){
+    other.push_back(address);
     sort(other.begin(),other.end());
     for(size_t i=0; i<other.size();i++){
         sk.addProcessToRN(other[i]);
@@ -11,7 +11,7 @@ Monitor::Monitor(int port,bool useToken,vector<int> other):sk(port,useToken){
     }
     context = zmq_ctx_new();
     socket = zmq_socket(context,ZMQ_REP);
-    string bind = "tcp://127.0.0.1:"+to_string(port);
+    string bind = "tcp://"+address;
     zmq_bind(socket,bind.c_str());
 
     thread handlerThread(&Monitor::receiveMessage, this);

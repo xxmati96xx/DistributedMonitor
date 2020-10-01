@@ -7,19 +7,19 @@ using namespace std;
 class Token{
     public:
     vector<int> getLN();
-    queue<int> getRequestProcess();
-    void addRequestProcess(int port);
+    queue<string> getRequestProcess();
+    void addRequestProcess(string address);
     void setLNPosition(int position,int sn);
-    void setRequestProcess(queue<int> LN);
+    void setRequestProcess(queue<string> requestProcess);
     void setToken(Message message);
-    int getFirstProcessFromQueue();
+    string getFirstProcessFromQueue();
     void addNewProcesToLN();
     void setLN(vector<int> LN);
 
 
     private:
     vector<int> LN;
-    queue<int> requestProcess;
+    queue<string> requestProcess;
 
 
 };

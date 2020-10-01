@@ -7,7 +7,7 @@
 using namespace std;
 class SK{
     public:
-    void addProcessToRN(int port);
+    void addProcessToRN(string address);
     void requestMessage();
     void tokenMessage();
     void reciveMessage(Message message);
@@ -18,19 +18,19 @@ class SK{
     void setData(string data);
     string getData();
     void setToken(Token token);
-    vector<pair<int,int>> getRN();
-    SK(int port, bool useToken);
+    vector<pair<string,int>> getRN();
+    SK(string address, bool useToken);
     ~SK();
 
     private:
     Message getRequestMessage();
-    bool isInRequestProcess(int port);
-    int port;
+    bool isInRequestProcess(string address);
+    string address;
     Token token;
     bool useToken;
     string data;
-    void sendMessage(Message message,int port);
+    void sendMessage(Message message,string address);
     void *context;
-    vector<pair<int,int>> RN;
+    vector<pair<string,int>> RN;
 
 };
