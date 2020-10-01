@@ -180,8 +180,8 @@ void test_producer1(){
     size_t size = 5;
     vector<string> other;
     other.push_back("192.168.6.104:1251");
-    other.push_back("192.168.6.113:1252");
-    other.push_back("192.168.6.113:1253");
+    //other.push_back("192.168.6.113:1252");
+    //other.push_back("192.168.6.113:1253");
     Monitor monit{"192.168.6.104:1250",true,other};
     int i=0;
     while (i<100){
@@ -190,12 +190,12 @@ void test_producer1(){
          queue<int> queue = stringToData(monit.getData());
        // }
         if(queue.size()<size){
-            cout<<"Push element: "<<i<<endl;
+           // cout<<"Push element: "<<i<<endl;
             queue.push(i);
             i++;
             //cout<<"jakie jest i"<<i<<endl;
         }else{
-            cout<<"Queue full"<<endl;
+           // cout<<"Queue full"<<endl;
         }
         monit.setData(dataToString(queue));
         monit.out();
@@ -209,8 +209,8 @@ void test_producer2(){
     size_t size = 5;
     vector<string> other;
     other.push_back("192.168.6.104:1250");
-    other.push_back("192.168.6.113:1252");
-     other.push_back("192.168.6.113:1253");
+    //other.push_back("192.168.6.113:1252");
+     //other.push_back("192.168.6.113:1253");
     Monitor monit{"192.168.6.104:1251",false,other};
     int i=0;
     while (i<100){
@@ -219,12 +219,12 @@ void test_producer2(){
           queue<int> queue = stringToData(monit.getData());
         //}
         if(queue.size()<size){
-            cout<<"Push element: "<<i<<endl;
+            //cout<<"Push element: "<<i<<endl;
             queue.push(i);
             i++;
             //cout<<"jakie jest i"<<i<<endl;
         }else{
-            cout<<"Queue full"<<endl;
+           // cout<<"Queue full"<<endl;
         }
         monit.setData(dataToString(queue));
         monit.out();

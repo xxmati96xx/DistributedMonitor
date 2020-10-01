@@ -1,7 +1,7 @@
 #define MONITOR_H
 #include "../sk/sk.h"
 #include <algorithm>
-#include <thread>
+
 #include <string.h>
 
 using namespace std;
@@ -19,6 +19,7 @@ class Monitor{
         SK sk;
         void *context;
         void *socket;
+        void createSocket();
         void receiveMessage();
     
 };

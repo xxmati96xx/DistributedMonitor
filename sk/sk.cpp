@@ -37,11 +37,17 @@ void SK::tokenMessage(){
 
 void SK::sendMessage(Message message,string address){
     string messageSerialized = message.messageSerialize();
-    //cout<<"message: "<<messageSerialized<<endl;
+    cout<<"message: "<<messageSerialized<<endl;
+    this_thread::sleep_for (std::chrono::seconds(10));
     void *socket = zmq_socket(context,ZMQ_REQ);
     string connect = "tcp://"+address;
     if(zmq_connect(socket,connect.c_str())==0){
-        zmq_send(socket,messageSerialized.c_str(),messageSerialized.size(),0); 
+        if(zmq_send(socket,messageSerialized.c_str(),messageSerialized.size(),0)>0){
+            cout<<"test"<<endl;
+        } 
+        else{
+            cout<<"błąd"<<endl;
+        }
         //dla testów wyłaczone 
     }
     else{
@@ -62,7 +68,7 @@ void SK::reciveMessage(Message mes){
                 break;
             }
         }
-        if(useToken && token.getRequestProcess().size()==0){
+        if(useToken && token.getRequestProcess().size()==0 && !usedCS){
             vector<int> LN = token.getLN();  
             for(size_t i=0; i<RN.size(); i++){
                 if(RN[i].second == LN[i]+1){
@@ -148,4 +154,12 @@ void SK::setData(string data){
 
 string SK::getData(){
     return data;
+}
+
+void SK::setUsedCS(bool usedCS){
+    this->usedCS = usedCS; 
+}
+
+bool SK::getUsedCS(){
+    return usedCS;
 }
