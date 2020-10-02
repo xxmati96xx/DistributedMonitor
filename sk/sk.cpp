@@ -12,43 +12,46 @@ void SK::initLN(){
 void SK::requestMessage(){
     for(size_t i=0; i<RN.size();i++){
         if(RN[i].first == address){
-            //cout<<"Test sn increment:przed "<<RN[i].second<<endl;
             RN[i].second = RN[i].second + 1; 
-            //cout<<"Test sn increment:po "<<RN[i].second<<endl;
         }
     }
     Message message = getRequestMessage();
     for(size_t i=0; i<RN.size();i++){
         if(RN[i].first != address){
-            //cout<<"Test port send: "<<RN[i].first<<endl;
             sendMessage(message,RN[i].first);
         }
     }
 }
     
+void SK::reSendRequest(){
+    Message message = getRequestMessage();
+    for(size_t i=0; i<RN.size();i++){
+        if(RN[i].first != address){
+            sendMessage(message,RN[i].first);
+        }
+    }
+}
+
 void SK::tokenMessage(){
-    useToken = false;
-    string destination = token.getFirstProcessFromQueue();
-    Message message{"T",destination,token.getLN(),token.getRequestProcess()};
-    message.setData(data);
-    sendMessage(message,destination);
+        string destination = token.getFirstProcessFromQueue();
+        useToken = false;
+        Message message{"T",destination,token.getLN(),token.getRequestProcess()};
+        message.setData(data);
+        sendMessage(message,destination);
 }
 
 
 void SK::sendMessage(Message message,string address){
     string messageSerialized = message.messageSerialize();
-    cout<<"message: "<<messageSerialized<<endl;
-    this_thread::sleep_for (std::chrono::seconds(10));
     void *socket = zmq_socket(context,ZMQ_REQ);
     string connect = "tcp://"+address;
     if(zmq_connect(socket,connect.c_str())==0){
         if(zmq_send(socket,messageSerialized.c_str(),messageSerialized.size(),0)>0){
-            cout<<"test"<<endl;
+           
         } 
         else{
-            cout<<"błąd"<<endl;
+            cout<<"zmq_error"<<zmq_strerror(zmq_errno())<<endl;
         }
-        //dla testów wyłaczone 
     }
     else{
         cout<<"zmq_error"<<zmq_strerror(zmq_errno())<<endl;
@@ -59,12 +62,12 @@ void SK::sendMessage(Message message,string address){
 void SK::reciveMessage(Message mes){
     Message message = mes.messageDeserialize();
     if(message.getMessageType() == "R"){
+        if(message.getAddress() == "127.0.0.1:1251"){
+            cout<<"resendmessagetest: "<<message.getAddress()<<" sn "<<message.getSn()<<endl;
+        }
         for(size_t i=0; i<RN.size();i++){
             if(RN[i].first == message.getAddress()){
-                //cout<<"Add to RN second "<<RN[i].first<<" "<<RN[i].second<<endl;
-                //cout<<"SN message: "<<message.getSn()<<endl;
-                RN[i].second = max(RN[i].second,message.getSn());//poprawić na max()
-                //cout<<"Test add to RN second "<<RN[i].first<<" "<<RN[i].second<<endl;
+                RN[i].second = max(RN[i].second,message.getSn());
                 break;
             }
         }
@@ -91,7 +94,6 @@ void SK::reciveMessage(Message mes){
 Message SK::getRequestMessage(){
     for(size_t i=0; i<RN.size(); i++){
         if(RN[i].first == address){
-            //cout<<"sn :"<<RN[i].second<<endl;
             return {"R",RN[i].first,RN[i].second};
         }
     

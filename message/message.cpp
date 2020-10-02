@@ -34,10 +34,9 @@ Message Message::messageDeserialize(){
         }
         Message mes{"T",fragmentStringMessage[1],LN,requestProcess};
         if(fragmentStringMessage.size()>4){
-        mes.setData(fragmentStringMessage[4]);
+            mes.setData(fragmentStringMessage[4]);
         }
         return mes;
-        //return Message{"T",stoi(fragmentStringMessage[1]),LN,requestProcess};
     }
     return Message{"B",0,0};
 }
@@ -76,7 +75,7 @@ string Message::vectorToString(vector<int> LN){
     for(size_t i=0; i<LN.size()-1;i++){
         vectorSting += to_string(LN.at(i))+";";
     }
-    vectorSting += to_string(LN.at(LN.size()-1)); //last element without ";"
+    vectorSting += to_string(LN.at(LN.size()-1));
     return vectorSting;
 }
 
@@ -89,7 +88,7 @@ string Message::queueToString(queue<string> requestProcess){
          queueString += request.front()+";";
         request.pop();
     }
-    queueString.pop_back(); //remove last element ";"
+    queueString.pop_back();
     return queueString;
     }
     queueString += "empty";

@@ -19,6 +19,7 @@ class SK{
     string getData();
     void setUsedCS(bool usedCS);
     bool getUsedCS();
+    void reSendRequest();
     void setToken(Token token);
     vector<pair<string,int>> getRN();
     SK(string address, bool useToken);
@@ -32,6 +33,7 @@ class SK{
     bool useToken;
     bool usedCS;
     string data;
+    int tmp;
     void sendMessage(Message message,string address);
     void *context;
     vector<pair<string,int>> RN;

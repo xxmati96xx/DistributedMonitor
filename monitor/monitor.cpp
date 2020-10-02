@@ -22,6 +22,8 @@ Monitor::Monitor(string address,bool useToken,vector<string> other):sk(address,u
 
 }
 
+
+
 Monitor::~Monitor(){
     zmq_close(socket);
     zmq_ctx_destroy(context);
@@ -33,10 +35,16 @@ void Monitor::in(){
 
     }else{
         sk.requestMessage();
-        cout<<"jestem zablokowany"<<endl;
+        int resend = 0;
         while (!sk.getUseToken())
         {
-            this_thread::sleep_for (std::chrono::milliseconds(10));
+            this_thread::sleep_for (std::chrono::seconds(1));
+            resend++;
+            if(resend == 10){
+                sk.reSendRequest();
+                resend = 0;
+            }
+
         }
     }
 }
@@ -51,13 +59,9 @@ void Monitor::receiveMessage(){
     char *receiveBUff = new char[BUFSIZ];
     while(1){
         memset(receiveBUff,0,BUFSIZ);
-        //cout<<"to moze byc bład"<<endl;
         if(zmq_recv(socket,receiveBUff,BUFSIZ,0)>-1){
-            //cout<<"czy tu jest bład"<<endl;
             zmq_send(socket,"",0,0);
             string message(receiveBUff);
-            //cout<<message<<endl;
-             //cout<<"message przed deserializacja"<<message<<endl;
             sk.reciveMessage(message);
         }
     }

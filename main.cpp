@@ -5,9 +5,6 @@
 
 using namespace std;
 
-//queue<int> *buffer;
-//size_t size;
-
 void test_messageSerializeT(){ 
     vector<int> LN = {1,3,7};
     queue<string> requestProcess;
@@ -159,104 +156,37 @@ vector<string> fragmentString(const string &txt, char ch)
 }
 
 queue<int> stringToData(string data){
-    //cout<<data.size()<<" wielkość danych"<<endl;
     queue<int> queue;
     if(data.size()>0){
         vector<string> fragmentStringData = fragmentString(data,'|');
-    
         if(fragmentStringData.size()>0){
             for(size_t i=0; i<fragmentStringData.size();i++){
-        //cout<<"push elemetn: "+fragmentStringData[i]<<endl;
                 queue.push(stoi(fragmentStringData[i]));
-        
             }
         }
     }
     return queue;
 }
 
-void test_producer1(){
-    //queue<int> queue;
+void test_producer1(string address,string token, string otherAddress){
     size_t size = 5;
     vector<string> other;
-    other.push_back("192.168.6.104:1251");
-    //other.push_back("192.168.6.113:1252");
-    //other.push_back("192.168.6.113:1253");
-    Monitor monit{"192.168.6.104:1250",true,other};
+    other.push_back(address);
+    vector<string> otherAddresses = fragmentString(otherAddress,',');
+    for(size_t i=0;i<otherAddresses.size();i++){
+        other.push_back(otherAddresses[i]);
+    }
+    Monitor monit{address,(bool)stoi(token),other};
     int i=0;
     while (i<100){
         monit.in();
-        //if(monit.getData().size()>0){
          queue<int> queue = stringToData(monit.getData());
-       // }
         if(queue.size()<size){
-           // cout<<"Push element: "<<i<<endl;
+            cout<<"Push element: "<<i<<endl;
             queue.push(i);
             i++;
-            //cout<<"jakie jest i"<<i<<endl;
         }else{
-           // cout<<"Queue full"<<endl;
-        }
-        monit.setData(dataToString(queue));
-        monit.out();
-         this_thread::sleep_for (std::chrono::milliseconds(1000));
-         
-    }
-    cout<<"end"<<endl;
-}
-void test_producer2(){
-   // queue<int> queue;
-    size_t size = 5;
-    vector<string> other;
-    other.push_back("192.168.6.104:1250");
-    //other.push_back("192.168.6.113:1252");
-     //other.push_back("192.168.6.113:1253");
-    Monitor monit{"192.168.6.104:1251",false,other};
-    int i=0;
-    while (i<100){
-        monit.in();
-        //if(monit.getData().size()>0){
-          queue<int> queue = stringToData(monit.getData());
-        //}
-        if(queue.size()<size){
-            //cout<<"Push element: "<<i<<endl;
-            queue.push(i);
-            i++;
-            //cout<<"jakie jest i"<<i<<endl;
-        }else{
-           // cout<<"Queue full"<<endl;
-        }
-        monit.setData(dataToString(queue));
-        monit.out();
-         this_thread::sleep_for (std::chrono::milliseconds(1000));
-        
-    }
-     cout<<"end"<<endl;
-}
-
-void test_consument1(){
-    //queue<int> queue;
-    
-    vector<string> other;
-    other.push_back("192.168.6.104:1250");
-    other.push_back("192.168.6.104:1251");
-    other.push_back("192.168.6.113:1253");
-    Monitor monit{"192.168.6.113:1252",false,other};
-    int i=0;
-    while (i<100)
-    {
-        monit.in();
-        //if(monit.getData().size()>0){
-            queue<int> queue = stringToData(monit.getData());
-        //}
-        if(queue.size()!=0){
-            int item = queue.front();
-            queue.pop();
-            cout<<"Take element: "<<item<<endl;
-            i++;
-            //cout<<"jakie jest i"<<i<<endl;
-        }else{
-            cout<<"Queue empty"<<endl;
+            cout<<"Queue full"<<endl;
         }
         monit.setData(dataToString(queue));
         monit.out();
@@ -266,34 +196,35 @@ void test_consument1(){
     cout<<"end"<<endl;
 }
 
-void test_consument2(){
+void test_consument1(string address,string token, string otherAddress){
     vector<string> other;
-    other.push_back("192.168.6.104:1251");
-    other.push_back("192.168.6.104:1250");
-    other.push_back("192.168.6.113:1252");
-    Monitor monit{"192.168.6.113:1253",false,other};
+    other.push_back(address);
+    vector<string> otherAddresses = fragmentString(otherAddress,',');
+    for(size_t i=0;i<otherAddresses.size();i++){
+        other.push_back(otherAddresses[i]);
+    }
+    Monitor monit{address,(bool)stoi(token),other};
     int i=0;
     while (i<100)
     {
         monit.in();
-        //if(monit.getData().size()>0){
+        
             queue<int> queue = stringToData(monit.getData());
-        //}
+        
         if(queue.size()!=0){
             int item = queue.front();
             queue.pop();
             cout<<"Take element: "<<item<<endl;
             i++;
-            //cout<<"jakie jest i"<<i<<endl;
         }else{
             cout<<"Queue empty"<<endl;
         }
         monit.setData(dataToString(queue));
         monit.out();
          this_thread::sleep_for (std::chrono::milliseconds(1000));
-        
+         
     }
-     cout<<"end"<<endl;
+    cout<<"end"<<endl;
 }
 
 void test_dataSendInTokenMessage(){
@@ -307,7 +238,7 @@ void test_dataSendInTokenMessage(){
         cout<<"Wyswietl wiadomosc "<<str<<endl;
         monit.setData(str);
         monit.out();
-         this_thread::sleep_for (std::chrono::seconds(3));
+         this_thread::sleep_for (std::chrono::seconds(1));
     }
 }
 void test_dataSendInTokenMessage1(){
@@ -321,9 +252,10 @@ void test_dataSendInTokenMessage1(){
         cout<<"Wyswietl wiadomosc "<<str<<endl;
         monit.setData(str);
         monit.out();
-         this_thread::sleep_for (std::chrono::seconds(3));
+         this_thread::sleep_for (std::chrono::seconds(1));
     }
 }
+
 int main(int argc,char **argv){
     test_messageSerializeT();
     test_messageSerializeR();
@@ -335,96 +267,13 @@ int main(int argc,char **argv){
     switch (stoi(argv[1]))
     {
     case 1:
-        test_producer1();
+        test_producer1(argv[2],argv[3],argv[4]);
         break;
     case 2:
-        test_producer2();
-        break;
-    case 3:
-        test_consument1();
-        break;
-    case 4:
-        test_consument2();
+        test_consument1(argv[2],argv[3],argv[4]);
         break;
     default:
         break;
     }
-  /*
-
-    vector<string> addres;
-    addres.push_back("192.168.0.15:1251");
-    addres.push_back("192.168.0.16:1251");
-    addres.push_back("192.168.0.20:1251");
-    addres.push_back("027.0.0.1:1242");
-    addres.push_back("192.168.0.1:1251");
-    addres.push_back("127.0.0.1:1242");
-    sort(addres.begin(),addres.end());
-    for(size_t i=0;i<addres.size();i++){
-        cout<<"vector element1: "<<addres[i]<<endl;
-    }
-    vector<string> addres1;
-    addres1.push_back("192.168.0.16:1251");
-    addres1.push_back("192.168.0.15:1251");
-    addres1.push_back("192.168.0.20:1251");
-    addres1.push_back("027.0.0.1:1242");
-    addres1.push_back("192.168.0.1:1251");
-    addres1.push_back("127.0.0.1:1242");
-    sort(addres1.begin(),addres1.end());
-    for(size_t i=0;i<addres1.size();i++){
-        cout<<"vector element2: "<<addres1[i]<<endl;
-    }
-    vector<string> addres2;
-    addres2.push_back("027.0.0.1:1242");
-    addres2.push_back("192.168.0.16:1251");
-    addres2.push_back("192.168.0.15:1251");
-    addres2.push_back("192.168.0.20:1251");
-    addres2.push_back("192.168.0.1:1251");
-    addres2.push_back("127.0.0.1:1242");
-    sort(addres2.begin(),addres2.end());
-    for(size_t i=0;i<addres2.size();i++){
-        cout<<"vector element3: "<<addres2[i]<<endl;
-    }
-    vector<string> addres3;
-    string st = "192.168.0.20:1251";
-    addres3.push_back("192.168.0.1:1251");
-    addres3.push_back("192.168.0.16:1251");
-    addres3.push_back("192.168.0.15:1251");
-    addres3.push_back("192.168.0.20:1251");
-    addres3.push_back("027.0.0.1:1242");
-    addres3.push_back("127.0.0.1:1242");
-    sort(addres3.begin(),addres3.end());
-    for(size_t i=0;i<addres3.size();i++){
-        if(st == addres3[i]){
-            cout<<"Działa"<<endl;
-        }
-        cout<<"vector element4: "<<addres3[i]<<endl;
-    }
-    if((addres == addres1) && (addres2 == addres3) && (addres == addres2) && (addres1 == addres3) && (addres == addres3) && (addres1 == addres2)){
-        cout<<"OK"<<endl;
-    }else
-    {
-       cout<<"FAIL"<<endl;
-    }
-    
-    vector<pair<string,int>> RN;
-    string st = "192.168.0.18:1251";
-    RN.push_back(make_pair("192.168.0.20:1251",0));
-    RN.push_back(make_pair("192.168.0.5:1251",0));
-    RN.push_back(make_pair("192.168.0.18:1251",0));
-    RN.push_back(make_pair("192.168.0.20:1245",0));
-    for(size_t i=0;i<RN.size();i++){
-        if(RN[i].first==st) {
-        RN[i].second = RN[i].second + 1;     
-        }
-    }
-    // for (auto it = begin (RN); it != end (RN); ++it) {
-    //    if(it->first==st) it->second++;     
-   // }
-    for (auto it = begin (RN); it != end (RN); ++it) {
-        cout<<it->first<<" addres "<<it->second<<" SN value"<<endl;     
-    }
-    */
-    
-   
     return 0;
 };
