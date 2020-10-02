@@ -4,15 +4,15 @@
 #include <queue>
 #include <zmq.h>
 #include <thread>
+#include <algorithm>
 using namespace std;
 class SK{
     public:
-    void addProcessToRN(string address);
+    void addProcessToRN(vector<string> address);
     void requestMessage();
     void tokenMessage();
     void reciveMessage(Message message);
     void endCS();
-    void initLN();
     Token getToken();
     bool getUseToken();
     void setData(string data);

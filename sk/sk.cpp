@@ -1,12 +1,14 @@
 #include "sk.h"
 
 
-void SK::addProcessToRN(string address){
-    RN.push_back(make_pair(address,0));
-}
-
-void SK::initLN(){
-    token.addNewProcesToLN();
+void SK::addProcessToRN(vector<string> addresses){
+        sort(addresses.begin(),addresses.end());
+        for(size_t i=0; i<addresses.size();i++){
+            RN.push_back(make_pair(addresses[i],0));
+                if(useToken){
+                    token.addNewProcesToLN();
+        }
+     }
 }
 
 void SK::requestMessage(){
@@ -62,9 +64,6 @@ void SK::sendMessage(Message message,string address){
 void SK::reciveMessage(Message mes){
     Message message = mes.messageDeserialize();
     if(message.getMessageType() == "R"){
-        if(message.getAddress() == "127.0.0.1:1251"){
-            cout<<"resendmessagetest: "<<message.getAddress()<<" sn "<<message.getSn()<<endl;
-        }
         for(size_t i=0; i<RN.size();i++){
             if(RN[i].first == message.getAddress()){
                 RN[i].second = max(RN[i].second,message.getSn());

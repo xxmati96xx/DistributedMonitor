@@ -1,6 +1,5 @@
 #define MONITOR_H
 #include "../sk/sk.h"
-#include <algorithm>
 #include <iostream>
 #include <csignal>
 #include <string.h>

@@ -2,27 +2,16 @@
 
 Monitor::Monitor(string address,bool useToken,vector<string> other):sk(address,useToken){
     other.push_back(address);
-    sort(other.begin(),other.end());
-    for(size_t i=0; i<other.size();i++){
-        sk.addProcessToRN(other[i]);
-        if(useToken){
-            sk.initLN();
-        }
-    }
+    sk.addProcessToRN(other);
     context = zmq_ctx_new();
     socket = zmq_socket(context,ZMQ_REP);
     int *noLinger = 0;
     zmq_setsockopt(socket,ZMQ_LINGER,noLinger,size_t(ZMQ_LINGER));
     string bind = "tcp://"+address;
     zmq_bind(socket,bind.c_str());
-
     thread handlerThread(&Monitor::receiveMessage, this);
     handlerThread.detach();
-
-
 }
-
-
 
 Monitor::~Monitor(){
     zmq_close(socket);
@@ -38,7 +27,7 @@ void Monitor::in(){
         int resend = 0;
         while (!sk.getUseToken())
         {
-            this_thread::sleep_for (std::chrono::seconds(1));
+            this_thread::sleep_for (std::chrono::milliseconds(100));
             resend++;
             if(resend == 10){
                 sk.reSendRequest();

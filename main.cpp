@@ -53,11 +53,13 @@ void test_messageDeserializeT(){
 };
 
 void test_reciveMessage(){
+    vector<string> other;
     SK sk{"192.168.6.10:1250",true};
-    sk.addProcessToRN("192.168.6.10:1251");
-    sk.addProcessToRN("192.168.6.10:1252");
-    sk.addProcessToRN("192.168.6.10:1253");
-    sk.addProcessToRN("192.168.6.10:1254");
+    other.push_back("192.168.6.10:1251");
+    other.push_back("192.168.6.10:1252");
+    other.push_back("192.168.6.10:1253");
+    other.push_back("192.168.6.10:1254");
+    sk.addProcessToRN(other);
     vector<int> LN = {0,0,0,0,0};
     Token token = sk.getToken();
     token.setLN(LN);
@@ -89,11 +91,13 @@ void test_reciveMessage(){
 
 
 void test_tokenMessage(){
+    vector<string> other;
     SK sk{"192.168.6.10:1250",false};
-    sk.addProcessToRN("192.168.6.10:1251");
-    sk.addProcessToRN("192.168.6.10:1252");
-    sk.addProcessToRN("192.168.6.10:1253");
-    sk.addProcessToRN("192.168.6.10:1254");
+    other.push_back("192.168.6.10:1251");
+    other.push_back("192.168.6.10:1252");
+    other.push_back("192.168.6.10:1253");
+    other.push_back("192.168.6.10:1254");
+    sk.addProcessToRN(other);
     queue<string> simpleQueue;
     simpleQueue.push("192.168.6.10:1251");
     simpleQueue.push("192.168.6.10:1252");
@@ -112,11 +116,13 @@ void test_tokenMessage(){
 }
 
 void test_requestMessage(){
+    vector<string> other;
     SK sk{"192.168.6.10:1250",false};
-    sk.addProcessToRN("192.168.6.10:1251");
-    sk.addProcessToRN("192.168.6.10:1252");
-    sk.addProcessToRN("192.168.6.10:1253");
-    sk.addProcessToRN("192.168.6.10:1254");
+    other.push_back("192.168.6.10:1251");
+    other.push_back("192.168.6.10:1252");
+    other.push_back("192.168.6.10:1253");
+    other.push_back("192.168.6.10:1254");
+    sk.addProcessToRN(other);
     sk.requestMessage();
 }
 
